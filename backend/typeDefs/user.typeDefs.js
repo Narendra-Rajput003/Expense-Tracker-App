@@ -1,40 +1,40 @@
-import {users} from "../dummyData/data.js";
-
-const userTypeDefs=`#graphql
-
-type User{
-    _id:ID!,
-    username:String!,
-    name: String!,
-    password:String!,
-    gender:String,
-    profilePicture:String,
+const userTypeDef = `#graphql
+type User {
+    _id: ID!
+    username: String!
+    name: String!
+    password: String!
+    profilePicture: String
+    gender: String!
+    transactions: [Transaction!]
 }
 
 type Query {
-     users:[User],
-    authUser:User,
-    user(userId:ID!):User
+    authUser: User
+    user(userId:ID!): User
 }
 
-type Mutation{
-    signUp(input:SignUpInput!):User,
-    login(input:LoginInput!):User,
-    logout:LogoutResponse
+type Mutation {
+    signUp(input: SignUpInput!): User
+    login(input: LoginInput!): User
+    logout: LogoutResponse
 }
 
-input SignUpInput{
-    username:String!,
-    name:String!,
-    password:String!,
-}
-input  LoginInput{
-    username:String!,
-    password:String!,
-}
-type LogoutResponse{
-    message:String!
+input SignUpInput {
+    username: String!
+    name: String!
+    password: String!
+    gender: String!
 }
 
-`
-export default userTypeDefs;
+input LoginInput {
+    username: String!
+    password: String!
+}
+
+type LogoutResponse {
+    message: String!
+}
+`;
+
+export default userTypeDef;
