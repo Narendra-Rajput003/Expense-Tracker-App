@@ -13,7 +13,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomePage = () => {
 
-    const {dat}=useQuery(GET_AUTHENTICATE_USER)
+    const {data}=useQuery(GET_AUTHENTICATE_USER)
 
     const chartData = {
         labels: ["Saving", "Expense", "Investment"],

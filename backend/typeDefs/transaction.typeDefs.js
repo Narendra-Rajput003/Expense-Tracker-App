@@ -1,6 +1,4 @@
-
-
-const transactionTypeDefs=` #graphql
+const transactionTypeDefs = ` #graphql
 
 type Transaction {
         id: ID! 
@@ -22,12 +20,18 @@ transaction(transactionId: ID!): Transaction
 
 type Mutation {
 
-createTransaction(input:createTransaction!):Transaction!
+createTransaction(input: CreateTransactionInput!):Transaction!
 updateTransaction(input:updateTransactionInput!):Transaction!
 deleteTransaction(transactionId:ID!):Transaction 
+
 }
 
-input createTransaction {
+type CategoryStatistics {
+    category: String!
+    totalAmount: Float!
+  }
+
+input  CreateTransactionInput {
  description: String!
  paymentType: String!
  location: String
@@ -37,14 +41,17 @@ input createTransaction {
 
 }
 
-input updateTransactionInput {
-transactionId: ID!
-}
 
-input deleteTransaction {
-transactionId: ID!
-}
+  input UpdateTransactionInput {
+    transactionId: ID!
+    description: String
+    paymentType: String
+    category: String
+    amount: Float
+    location: String
+    date: String
+  }
 
-`
+`;
 
-export  default transactionTypeDefs;
+export default transactionTypeDefs;
