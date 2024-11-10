@@ -1,3 +1,5 @@
+
+
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -9,40 +11,43 @@ import {useMutation, useQuery} from "@apollo/client";
 import {LOGOUT} from "../graphql/mutations/user.mutation.js";
 import toast from "react-hot-toast";
 import {GET_AUTHENTICATE_USER} from "../graphql/queries/user.query.js";
+import {GET_TRANSACTION_STATISTICS} from "../graphql/queries/transaction.query.js"
+import { useEffect } from "react";
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomePage = () => {
 
-    const {data}=useQuery(GET_AUTHENTICATE_USER)
-
-    const chartData = {
-        labels: ["Saving", "Expense", "Investment"],
-        datasets: [
-            {
-                label: "%",
-                data: [13, 8, 3],
-                backgroundColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235)"],
-                borderColor: ["rgba(75, 192, 192)", "rgba(255, 99, 132)", "rgba(54, 162, 235, 1)"],
-                borderWidth: 1,
-                borderRadius: 30,
-                spacing: 10,
-                cutout: 130,
-            },
-        ],
-    };
+    const {data}=useQuery(GET_TRANSACTION_STATISTICS);
+    const {data:authUserData}=useQuery(GET_AUTHENTICATE_USER)
 
 
 
+    
 
-    const [logout,{loading}] = useMutation(LOGOUT,{
+
+
+    const [logout,{loading,client}] = useMutation(LOGOUT,{
         refetchQueries:["GetAuthenticatedUser"]
     })
+
+
+  useEffect(()=>{
+      if(data?.categoryStatistics){
+        
+      }
+  })
+
+
     const handleLogout = async () => {
     try{
         await  logout();
         // Clear the Apollo Client cache FROM THE DOCS
         // https://www.apollographql.com/docs/react/caching/advanced-topics/#:~:text=Resetting%20the%20cache,any%20of%20your%20active%20queries
-
+        client.resetStore()
     }catch (error){
         console.error("Error logging out:", error);
         toast.error(error.message);
@@ -59,7 +64,7 @@ const HomePage = () => {
                         Spend wisely, track wisely
                     </p>
                     <img
-                        src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
+                        src={authUserData?.authUser.profilePicture}
                         className='w-11 h-11 rounded-full border cursor-pointer'
                         alt='Avatar'
                     />

@@ -19,15 +19,19 @@ const LoginPage = () => {
         }));
     };
 
-   const [login ,{loading}]= useMutation(LOGIN)
+   const [login ,{loading}]= useMutation(LOGIN);
+   console.log(login)
 
     const handleSubmit =async (e) => {
         e.preventDefault();
         if (!loginData.username || !loginData.password) return toast.error("Please fill in all fields");
         try{
             await  login({
+               variables:{
                 input:loginData
+               }
             })
+            toast.success("Login successful!");
         }catch (e){
             console.log(e);
             toast.error(e.message)

@@ -1,7 +1,7 @@
 const transactionTypeDefs = ` #graphql
 
 type Transaction {
-        id: ID! 
+        _id: ID! 
         userId: ID!
         amount:Float!
         category:String!
@@ -21,7 +21,7 @@ transaction(transactionId: ID!): Transaction
 type Mutation {
 
 createTransaction(input: CreateTransactionInput!):Transaction!
-updateTransaction(input:updateTransactionInput!):Transaction!
+updateTransaction(input: UpdateTransactionInput!):Transaction!
 deleteTransaction(transactionId:ID!):Transaction 
 
 }
