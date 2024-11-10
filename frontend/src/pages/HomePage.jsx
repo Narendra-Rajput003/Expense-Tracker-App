@@ -5,10 +5,16 @@ import Cards from "../components/Cards";
 import TransactionForm from "../components/TransactionForm";
 
 import { MdLogout } from "react-icons/md";
-
+import {useMutation, useQuery} from "@apollo/client";
+import {LOGOUT} from "../graphql/mutations/user.mutation.js";
+import toast from "react-hot-toast";
+import {GET_AUTHENTICATE_USER} from "../graphql/queries/user.query.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const HomePage = () => {
+
+    const {dat}=useQuery(GET_AUTHENTICATE_USER)
+
     const chartData = {
         labels: ["Saving", "Expense", "Investment"],
         datasets: [
@@ -25,11 +31,25 @@ const HomePage = () => {
         ],
     };
 
-    const handleLogout = () => {
-        console.log("Logging out...");
+
+
+
+    const [logout,{loading}] = useMutation(LOGOUT,{
+        refetchQueries:["GetAuthenticatedUser"]
+    })
+    const handleLogout = async () => {
+    try{
+        await  logout();
+        // Clear the Apollo Client cache FROM THE DOCS
+        // https://www.apollographql.com/docs/react/caching/advanced-topics/#:~:text=Resetting%20the%20cache,any%20of%20your%20active%20queries
+
+    }catch (error){
+        console.error("Error logging out:", error);
+        toast.error(error.message);
+
+    }
     };
 
-    const loading = false;
 
     return (
         <>

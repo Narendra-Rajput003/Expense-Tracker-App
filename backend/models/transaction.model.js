@@ -14,13 +14,13 @@ const transactionSchema = new mongoose.Schema({
     },
     paymentType:{
         type:String,
-        enum:["cash","card"],
+        enum:["CreditCard","DebitCard","NetBanking","GooglePay","Paytm"],
         required:true
     },
     category:{
         type:String,
         required:true,
-        enum:["saving","expense","investment","other"]
+        enum:["saving","expense","investment","income","entertainment","education","travel","bills"]
     },
     amount:{
         type:Number,

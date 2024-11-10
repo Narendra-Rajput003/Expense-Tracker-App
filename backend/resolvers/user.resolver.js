@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 const userResolver={
     Query:{
-       authUser:(_,__,context)=>{
+       authUser:async (_,__,context)=>{
            try{
                const user=await context.getUser();
                return user;
@@ -26,7 +26,7 @@ const userResolver={
     Mutation: {
         signUp:async(_,{input},context)=>{
               try{
-                  console.log("context",context);
+
                   const {username,name , password , gender} = input;
                   if(!username || !name || !password || !gender){
                       throw new Error("All fields are required")
