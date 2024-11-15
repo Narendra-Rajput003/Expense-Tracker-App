@@ -59,3 +59,17 @@ export const DELETE_TRANSACTION = gql`
     }
   }
 `;
+
+
+export const GET_TRANSACTION_STATISTICS = gql `
+
+   query  GetTransactionStatistics{
+
+   categoryStatistics{
+     category
+     totalAmount
+   }
+   
+   }
+
+`

@@ -15,6 +15,7 @@ type Query {
 
 transactions: [Transaction]
 transaction(transactionId: ID!): Transaction
+categoryStatistics:[CategoryStatistics!]
 
 }
 

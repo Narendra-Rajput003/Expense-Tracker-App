@@ -1,19 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
+import { useMutation, useQuery } from "@apollo/client";
+import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
+import toast from "react-hot-toast";
 
 const TransactionPage = () => {
-  const [formData, setFormData] = useState({
-    description: "",
-    paymentType: "",
-    category: "",
-    amount: "",
-    location: "",
-    date: "",
+  const { id } = useParams();
+  const { data, loading, error } = useQuery(GET_TRANSACTION, {
+    variables: { id },
   });
+
+  const [updateTransaction, { loading: loadingUpdate }] = useMutation(UPDATE_TRANSACTION, {
+    refetchQueries: [{ query: GET_TRANSACTION_STATISTICS }],
+  });
+
+  const [formData, setFormData] = useState({
+    description:data?.transaction?.description ||  "",
+    paymentType:data?.transaction?.paymentType || "",
+    category:data?.transaction?.category || "",
+    amount:data?.transaction?.amount || "",
+    location:data?.transaction?.location || "",
+    date:data?.transaction?.date || "",
+  });
+
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        description: data.transaction.description ,
+        paymentType: data.transaction.paymentType ,
+        category: data.transaction.category ,
+        amount: data.transaction.amount ,
+        location: data.transaction.location ,
+        date: new Date(+data.transaction.date).toISOString().substr(0, 10),
+      });
+    }
+  }, [data]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("formData", formData);
+    try {
+      await updateTransaction({
+        variables: {
+          input: { ...formData, amount: parseFloat(formData.amount), transactionId: id },
+        },
+      });
+      toast.success("Transaction updated successfully");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -22,179 +59,102 @@ const TransactionPage = () => {
     }));
   };
 
-  // if (loading) return <TransactionFormSkeleton />;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading transaction data.</p>;
 
   return (
     <div className="h-screen max-w-4xl mx-auto flex flex-col items-center">
-      <p className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">
-        Update this transaction
-      </p>
-      <form
-        className="w-full max-w-lg flex flex-col gap-5 px-3 "
-        onSubmit={handleSubmit}
-      >
-        {/* TRANSACTION */}
-        <div className="flex flex-wrap">
-          <div className="w-full">
-            <label
-              className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
-              htmlFor="description"
-            >
-              Transaction
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="description"
-              name="description"
-              type="text"
-              placeholder="Rent, Groceries, Salary, etc."
-              value={formData.description}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-        {/* PAYMENT TYPE */}
-        <div className="flex flex-wrap gap-3">
-          <div className="w-full flex-1 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
-              htmlFor="paymentType"
-            >
-              Payment Type
-            </label>
-            <div className="relative">
-              <select
-                className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="paymentType"
-                name="paymentType"
-                onChange={handleInputChange}
-                defaultValue={formData.paymentType}
-              >
-                <option value="CreditCard">Credit Card</option>
-                <option value="DebitCard">Debit Card</option>
-                <option value="NetBanking">Net Banking</option>
-                <option value="GooglePay">Google Pay</option>
-                <option value="Paytm">Paytm</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* CATEGORY */}
-          <div className="w-full flex-1 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
-              htmlFor="category"
-            >
-              Category
-            </label>
-            <div className="relative">
-              <select
-                className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="category"
-                name="category"
-                onChange={handleInputChange}
-                defaultValue={formData.category}
-              >
-                <option value="saving">Saving</option>
-                <option value="expense">Expense</option>
-                <option value="investment">Investment</option>
-                <option value="income">Income</option>
-                <option value="entertainment">Entertainment</option>
-                <option value="education">Education</option>
-                <option value="travel">Travel</option>
-                <option value="bills">Bills</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* AMOUNT */}
-          <div className="w-full flex-1 mb-6 md:mb-0">
-            <label
-              className="block uppercase text-white text-xs font-bold mb-2"
-              htmlFor="amount"
-            >
-              Amount(₹)
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="amount"
-              name="amount"
-              type="number"
-              placeholder="150"
-              value={formData.amount}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        {/* LOCATION */}
-        <div className="flex flex-wrap gap-3">
-          <div className="w-full flex-1 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
-              htmlFor="location"
-            >
-              Location
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="location"
-              name="location"
-              type="text"
-              placeholder="New York"
-              value={formData.location}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          {/* DATE */}
-          <div className="w-full flex-1">
-            <label
-              className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
-              htmlFor="date"
-            >
-              Date
-            </label>
-            <input
-              type="date"
-              name="date"
-              id="date"
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-[11px] px-4 mb-3 leading-tight focus:outline-none
-						 focus:bg-white"
-              placeholder="Select date"
-              value={formData.date}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-        {/* SUBMIT BUTTON */}
+      <h2 className="md:text-4xl text-2xl lg:text-4xl font-bold text-center mb-6 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 text-transparent bg-clip-text">
+        Update Transaction
+      </h2>
+      <form onSubmit={handleSubmit} className="w-full max-w-lg flex flex-col gap-5 px-3">
+        <InputField
+          label="Transaction"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Rent, Groceries, Salary, etc."
+        />
+        <SelectField
+          label="Payment Type"
+          name="paymentType"
+          options={["CreditCard", "DebitCard", "NetBanking", "GooglePay", "Paytm"]}
+          value={formData.paymentType}
+          onChange={handleInputChange}
+        />
+        <SelectField
+          label="Category"
+          name="category"
+          options={["saving", "expense", "investment", "income", "entertainment", "education", "travel", "bills"]}
+          value={formData.category}
+          onChange={handleInputChange}
+        />
+        <InputField
+          label="Amount (₹)"
+          name="amount"
+          type="number"
+          value={formData.amount}
+          onChange={handleInputChange}
+          placeholder="150"
+        />
+        <InputField
+          label="Location"
+          name="location"
+          value={formData.location}
+          onChange={handleInputChange}
+          placeholder="New York"
+        />
+        <InputField
+          label="Date"
+          name="date"
+          type="date"
+          value={formData.date}
+          onChange={handleInputChange}
+        />
         <button
-          className="text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br
-          from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600"
           type="submit"
+          className="text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+          disabled={loadingUpdate}
         >
-          Update Transaction
+          {loadingUpdate ? "Updating..." : "Update Transaction"}
         </button>
       </form>
     </div>
   );
 };
+
+// Reusable Input Field Component
+const InputField = ({ label, name, type = "text", value, onChange, placeholder }) => (
+  <div className="flex flex-col">
+    <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2">{label}</label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    />
+  </div>
+);
+
+// Reusable Select Field Component
+const SelectField = ({ label, name, options, value, onChange }) => (
+  <div className="flex flex-col">
+    <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2">{label}</label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    >
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option.charAt(0).toUpperCase() + option.slice(1)}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
 export default TransactionPage;
