@@ -14,23 +14,6 @@ export const CREATE_TRANSACTION = gql`
   }
 `;
 
-// export const UPDATE_TRANSACTION=gql `
-//          mutation UpdateTransaction($input:UpdateTransactionInput!){
-//              updateTransaction(input:$input)}{
-//                         _id
-//                         description
-//                         amount
-//                         paymentType
-//                         category
-//                         location
-//                         date
-//
-//                      }
-//
-//           }
-//
-//
-// `;
 
 export const UPDATE_TRANSACTION = gql`
   mutation UpdateTransaction($input: UpdateTransactionInput!) {
@@ -61,15 +44,3 @@ export const DELETE_TRANSACTION = gql`
 `;
 
 
-export const GET_TRANSACTION_STATISTICS = gql `
-
-   query  GetTransactionStatistics{
-
-   categoryStatistics{
-     category
-     totalAmount
-   }
-   
-   }
-
-`

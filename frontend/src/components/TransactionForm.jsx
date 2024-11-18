@@ -4,7 +4,12 @@ import { CREATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
 
 const TransactionForm = () => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
   const [createTransaction, { loading }] = useMutation(CREATE_TRANSACTION, {
     refetchQueries: ["GetTransactions", "GetTransactionStatistics"],
   });
@@ -13,18 +18,29 @@ const TransactionForm = () => {
     try {
       await createTransaction({ variables: { input: transactionData } });
       reset();
-      toast.success("Transaction created successfully");
+      toast.success(
+        `Transaction "${transactionData.description}" added successfully!`
+      );
     } catch (error) {
-      toast.error("Failed to create transaction. Please try again.");
+      const errorMessage =
+        error?.graphQLErrors?.[0]?.message || "Something went wrong.";
+      console.error(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   return (
-    <form className="w-full max-w-lg flex flex-col gap-5 px-3" onSubmit={handleSubmit(onSubmit)}>
+    <form
+      className="w-full max-w-lg flex flex-col gap-5 px-3"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       {/* TRANSACTION DESCRIPTION */}
       <div className="flex flex-wrap">
         <div className="w-full">
-          <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="description">
+          <label
+            className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+            htmlFor="description"
+          >
             Transaction
           </label>
           <input
@@ -32,36 +48,59 @@ const TransactionForm = () => {
             id="description"
             placeholder="Rent, Groceries, Salary, etc."
             disabled={loading}
-            {...register("description", { required: "Description is required" })}
+            {...register("description", {
+              required: "Description is required",
+            })}
           />
-          {errors.description && <p className="text-red-500 text-xs italic">{errors.description.message}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-xs italic">
+              {errors.description.message}
+            </p>
+          )}
         </div>
       </div>
 
       {/* PAYMENT TYPE */}
       <div className="flex flex-wrap gap-3">
         <div className="w-full flex-1 mb-6 md:mb-0">
-          <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="paymentType">
+          <label
+            className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+            htmlFor="paymentType"
+          >
             Payment Type
           </label>
           <select
             className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="paymentType"
             disabled={loading}
-            {...register("paymentType", { required: "Please select a payment type" })}
+            defaultValue=""
+            {...register("paymentType", {
+              required: "Please select a payment type",
+            })}
           >
+            <option value="" disabled>
+              Select a payment type
+            </option>
             <option value="CreditCard">Credit Card</option>
             <option value="DebitCard">Debit Card</option>
             <option value="NetBanking">Net Banking</option>
             <option value="GooglePay">Google Pay</option>
             <option value="Paytm">Paytm</option>
           </select>
-          {errors.paymentType && <p className="text-red-500 text-xs italic">{errors.paymentType.message}</p>}
+
+          {errors.paymentType && (
+            <p className="text-red-500 text-xs italic">
+              {errors.paymentType.message}
+            </p>
+          )}
         </div>
 
         {/* CATEGORY */}
         <div className="w-full flex-1 mb-6 md:mb-0">
-          <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="category">
+          <label
+            className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+            htmlFor="category"
+          >
             Category
           </label>
           <select
@@ -79,13 +118,20 @@ const TransactionForm = () => {
             <option value="travel">Travel</option>
             <option value="bills">Bills</option>
           </select>
-          {errors.category && <p className="text-red-500 text-xs italic">{errors.category.message}</p>}
+          {errors.category && (
+            <p className="text-red-500 text-xs italic">
+              {errors.category.message}
+            </p>
+          )}
         </div>
       </div>
 
       {/* AMOUNT */}
       <div className="w-full flex-1 mb-6 md:mb-0">
-        <label className="block uppercase text-white text-xs font-bold mb-2" htmlFor="amount">
+        <label
+          className="block uppercase text-white text-xs font-bold mb-2"
+          htmlFor="amount"
+        >
           Amount(₹)
         </label>
         <input
@@ -97,31 +143,21 @@ const TransactionForm = () => {
           {...register("amount", {
             required: "Amount must be greater than zero",
             valueAsNumber: true,
-            validate: (value) => value > 0 || "Amount must be greater than zero",
+            validate: (value) =>
+              value > 0 || "Amount must be greater than zero",
           })}
         />
-        {errors.amount && <p className="text-red-500 text-xs italic">{errors.amount.message}</p>}
+        {errors.amount && (
+          <p className="text-red-500 text-xs italic">{errors.amount.message}</p>
+        )}
       </div>
 
-      {/* LOCATION */}
-      <div className="w-full flex-1 mb-6 md:mb-0">
-        <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="location">
-          Location
-        </label>
-        <input
-          className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-          id="location"
-          type="text"
-          placeholder="New York"
-          disabled={loading}
-          {...register("location", { required: "Location is required" })}
-        />
-        {errors.location && <p className="text-red-500 text-xs italic">{errors.location.message}</p>}
-      </div>
-
-      {/* DATE */}
-      <div className="w-full flex-1 mb-6 md:mb-0">
-        <label className="block uppercase tracking-wide text-white text-xs font-bold mb-2" htmlFor="date">
+       {/* DATE */}
+       <div className="w-full flex-1 mb-6 md:mb-0">
+        <label
+          className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+          htmlFor="date"
+        >
           Date
         </label>
         <input
@@ -132,8 +168,35 @@ const TransactionForm = () => {
           disabled={loading}
           {...register("date", { required: "Date is required" })}
         />
-        {errors.date && <p className="text-red-500 text-xs italic">{errors.date.message}</p>}
+        {errors.date && (
+          <p className="text-red-500 text-xs italic">{errors.date.message}</p>
+        )}
       </div>
+
+      {/* LOCATION */}
+      <div className="w-full flex-1 mb-6 md:mb-0">
+        <label
+          className="block uppercase tracking-wide text-white text-xs font-bold mb-2"
+          htmlFor="location"
+        >
+          Location
+        </label>
+        <input
+          className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+          id="location"
+          type="text"
+          placeholder="New York"
+          disabled={loading}
+          {...register("location", { required: "Location is required" })}
+        />
+        {errors.location && (
+          <p className="text-red-500 text-xs italic">
+            {errors.location.message}
+          </p>
+        )}
+      </div>
+
+     
 
       {/* SUBMIT BUTTON */}
       <button

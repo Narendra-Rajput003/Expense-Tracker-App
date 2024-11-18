@@ -22,7 +22,7 @@ const transactionResolver={
             try{
                 const FindTransactionById=await Transaction.findById(transactionId);
                 if(!FindTransactionById){
-                    throw new Error("Transaction Id not found");
+                    throw new Error("Transaction ID not found");
                 }
                 return FindTransactionById;
             }catch (e){

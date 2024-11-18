@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
 import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
+import { GET_TRANSACTION,GET_TRANSACTION_STATISTICS } from "../graphql/queries/transaction.query";
 import toast from "react-hot-toast";
 
 const TransactionPage = () => {
@@ -10,6 +10,8 @@ const TransactionPage = () => {
   const { data, loading, error } = useQuery(GET_TRANSACTION, {
     variables: { id },
   });
+
+  console.log("updaform",data)
 
   const [updateTransaction, { loading: loadingUpdate }] = useMutation(UPDATE_TRANSACTION, {
     refetchQueries: [{ query: GET_TRANSACTION_STATISTICS }],
