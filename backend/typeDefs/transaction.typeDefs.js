@@ -9,6 +9,7 @@ type Transaction {
         paymentType: String!
         location:String
         date:String!
+        user: User
 }
 
 type Query {

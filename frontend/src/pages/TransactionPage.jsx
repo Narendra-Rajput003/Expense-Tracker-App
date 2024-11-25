@@ -49,6 +49,7 @@ const TransactionPage = () => {
       });
       toast.success("Transaction updated successfully");
     } catch (error) {
+      
       toast.error(error.message);
     }
   };
@@ -60,6 +61,11 @@ const TransactionPage = () => {
       [name]: value,
     }));
   };
+
+
+  
+
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading transaction data.</p>;
