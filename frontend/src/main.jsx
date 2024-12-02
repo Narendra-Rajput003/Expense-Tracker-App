@@ -7,7 +7,7 @@ import GridBackground from "./components/ui/GridBackgroun.jsx";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 const client =new ApolloClient({
-    uri:'http://localhost:4000/graphql',
+    uri:import.meta.env.VITE_NODE_ENV=== "development"? 'http://localhost:4000/graphql':'/graphql',
     cache:new InMemoryCache(),
     credentials:"include", //This tells Apollo Client to send cookies along with every request to the server
 

@@ -2,6 +2,7 @@ import express from "express";
 import * as http from "node:http";
 import cors from "cors"
 import dotenv from "dotenv";
+import * as path from "node:path";
 
 import connectMongo  from "connect-mongodb-session"
 import session from "express-session";
@@ -21,6 +22,8 @@ import {configurePassport} from "./passport/passport.config.js";
 
 dotenv.config();
 configurePassport()
+
+const __dirname=path.resolve();
 const app=express();
 const httpServer=http.createServer(app);
 
@@ -71,10 +74,16 @@ app.use(
     expressMiddleware(server,{
         context:async({req,res})=>buildContext({req,res})
     })
-
     )
+
+
 await  new Promise( (resolve)=>httpServer.listen({port:4000},resolve))
 
+
+app.use(express.static(path.join(__dirname,"frontend/dist")))
+app.get("*",(req,res)=>{
+    res.sendFile(path.join(__dirname,"frontend/dist","index.html"));
+})
 await  connectDb();
 console.log(`Server ready at http://localhost:4000/graphql`);
 
